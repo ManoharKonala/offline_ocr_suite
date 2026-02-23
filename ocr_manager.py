@@ -15,17 +15,7 @@ from PIL import Image
 
 # OCR Engines
 import pytesseract
-try:
-    import easyocr
-    EASYOCR_AVAILABLE = True
-except ImportError:
-    EASYOCR_AVAILABLE = False
-
-try:
-    from paddleocr import PaddleOCR
-    PADDLEOCR_AVAILABLE = True
-except ImportError:
-    PADDLEOCR_AVAILABLE = False
+# Global availability flags will be set during engine initialization
 
 
 class OCREngine(Enum):
@@ -246,6 +236,14 @@ class EasyOCREngine:
     
     def __init__(self, config: Dict):
         self.config = config.get('easyocr', {})
+        # Try to import easyocr locally
+        global EASYOCR_AVAILABLE
+        try:
+            import easyocr
+            EASYOCR_AVAILABLE = True
+        except ImportError:
+            EASYOCR_AVAILABLE = False
+
         self.enabled = self.config.get('enabled', True) and EASYOCR_AVAILABLE
         self.gpu = self.config.get('gpu', False)
         self.languages = self.config.get('languages', ['en'])
@@ -329,6 +327,14 @@ class PaddleOCREngine:
     
     def __init__(self, config: Dict):
         self.config = config.get('paddleocr', {})
+        # Try to import paddleocr locally
+        global PADDLEOCR_AVAILABLE
+        try:
+            from paddleocr import PaddleOCR
+            PADDLEOCR_AVAILABLE = True
+        except (ImportError, RuntimeError, Exception):
+            PADDLEOCR_AVAILABLE = False
+
         self.enabled = self.config.get('enabled', True) and PADDLEOCR_AVAILABLE
         self.gpu = self.config.get('gpu', False)
         self.languages = self.config.get('languages', ['en'])

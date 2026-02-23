@@ -1,166 +1,70 @@
-# Offline OCR Suite - Multi-Engine OCR System
+# 🖼️ Offline OCR Suite
 
-A complete, extensible offline OCR system combining **Tesseract**, **EasyOCR**, and **PaddleOCR** for intelligent text extraction.
+![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Engines](https://img.shields.io/badge/engines-Tesseract%20%7C%20EasyOCR%20%7C%20PaddleOCR-orange)
 
-## Features
+A powerful, 100% offline OCR system designed for Windows. It intelligently combines **Tesseract**, **EasyOCR**, and **PaddleOCR** to provide state-of-the-art text extraction without requiring an internet connection.
 
-- 🔄 **Intelligent Auto-Selection** - Automatically picks best engine based on language and image type
-- ⚡ **Smart Caching** - Results cached by image hash to avoid reprocessing
-- 🖼️ **Advanced Preprocessing** - Deskewing, denoising, contrast enhancement
-- 📊 **Engine Comparison** - Run all engines and compare outputs
-- 🗳️ **Voting System** - Multiple engines "vote" on best text
-- 📁 **Batch Processing** - Process folders with progress tracking
-- 💾 **Multiple Interfaces** - CLI, GUI, and Python API
-- 🔒 **100% Offline** - No internet required after setup
+## ✨ Key Features
 
-## Installation
+- 🧠 **Intelligent Auto-Selection** – Automatically picks the best engine for your specific image (e.g., PaddleOCR for Asian languages, EasyOCR for photos).
+- ⚡ **Lazy Loading** – Engines only load when called, ensuring the GUI starts instantly and consumes minimal memory.
+- 🖼️ **Advanced Preprocessing** – Built-in deskewing, denoising, and contrast enhancement for better accuracy.
+- 💾 **Smart Caching** – Remembers previously processed images to avoid redundant computation.
+- 📊 **Engine Comparison** – Compare results from all three engines side-by-side to find the most accurate output.
 
-### 1. Create Virtual Environment
+---
 
-```bash
-cd offline_ocr_suite
-python -m venv venv
+## 🚀 Quick Start (Windows)
 
-# Activate virtual environment
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
+No complex setup required. Run these exact commands while inside the `offline_ocr_suite` directory.
+
+### 1. Launch the GUI
+The primary way to use the suite. Drag and drop images to see instant results.
+```powershell
+venv\Scripts\python.exe ocr_gui.py
 ```
 
-### 2. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Install Tesseract (System Dependency)
-
-**Windows:**
-- Download from: https://github.com/UB-Mannheim/tesseract/wiki
-- Install and add to PATH: `C:\Program Files\Tesseract-OCR`
-- Or update `config.yaml` with the full path to `tesseract.exe`
-
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install tesseract-ocr tesseract-ocr-eng
-```
-
-**macOS:**
-```bash
-brew install tesseract tesseract-lang
-```
-
-## Usage
-
-### Python API
-
-```python
-from ocr_manager import UnifiedOCR, OCREngine
-
-# Initialize
-ocr = UnifiedOCR()
-
-# Single image - auto engine selection
-results = ocr.recognize("document.png")
-for r in results:
-    print(f"[{r.engine}] {r.text} (confidence: {r.confidence:.2%})")
-
-# Force specific engine
-results = ocr.recognize("scan.jpg", engine=OCREngine.TESSERACT)
-
-# Get best result only
-best = ocr.recognize_best("photo.png", strategy="voting")
-print(f"Best: {best.text} from {best.engine}")
-
-# Batch processing
-import glob
-files = glob.glob("invoices/*.png")
-ocr.batch_process(files, output_file="results.json")
-
-# Compare engines
-comparison = ocr.compare_engines("test.png")
-for engine, results in comparison.items():
-    print(f"{engine}: {len(results)} results")
-```
-
-### Command Line
-
-```bash
-# Basic OCR with auto engine
-python ocr_cli.py document.png
-
-# Use specific engine
-python ocr_cli.py image.jpg -e tesseract -o output.json
+### 2. Use the CLI
+For fast, command-line processing:
+```powershell
+# Basic OCR
+venv\Scripts\python.exe ocr_cli.py document.png
 
 # Compare all engines
-python ocr_cli.py scan.png --compare
-
-# Batch process directory
-python ocr_cli.py ./invoices/ -e auto -o batch_results.json --best
-
-# Chinese document
-python ocr_cli.py chinese_doc.png -l ch -e paddleocr
+venv\Scripts\python.exe ocr_cli.py scan.png --compare
 ```
 
-### GUI Application
+---
 
-```bash
-python ocr_gui.py
-```
+## 🛠️ Project Structure
 
-## Configuration
+The project is organized to be lean and high-performance:
 
-Edit `config.yaml` to customize:
-- OCR engine settings (languages, models, GPU)
-- Preprocessing options (deskew, denoise, DPI)
-- Performance settings (caching, timeout)
-- Logging configuration
-
-## Engine Selection Logic
-
-**AUTO mode** intelligently selects engines based on:
-- **Asian languages** (Chinese, Japanese, Korean) → PaddleOCR → EasyOCR → Tesseract
-- **High-res color images** (photos, screenshots) → EasyOCR → PaddleOCR → Tesseract
-- **Scanned documents** → Tesseract → EasyOCR → PaddleOCR
-
-## Project Structure
-
-```
+```text
 offline_ocr_suite/
-├── ocr_manager.py      # Core OCR engine integration
-├── ocr_cli.py          # Command-line interface
-├── ocr_gui.py          # Tkinter GUI application
-├── config.yaml         # Configuration file
+├── ocr_manager.py      # Core intelligence & Engine Orchestration
+├── ocr_gui.py          # Professional Tkinter Interface
+├── ocr_cli.py          # Powerful Command-Line Tool
+├── config.yaml         # Project Configuration (Settings, Engines, Paths)
 ├── requirements.txt    # Python dependencies
-├── models/             # Downloaded OCR models (auto-created)
-├── cache/              # Result cache (auto-created)
-└── logs/               # Application logs (auto-created)
+├── examples.py         # Developer API examples
+├── venv/               # Project Virtual Environment (DO NOT DELETE)
+└── assets/             # Documentation visuals
 ```
 
-## Troubleshooting
+---
 
-**Tesseract not found:**
-- Verify installation: `tesseract --version`
-- Update `config.yaml` with full path to tesseract executable
+## ⚙️ Configuration
 
-**EasyOCR/PaddleOCR models downloading:**
-- First run downloads models (~200MB each)
-- Ensure stable internet connection on first use
-- Models stored in `./models/` directory
+You can customize the behavior in `config.yaml`:
+- **Enable/Disable Engines**: Toggle Tesseract, EasyOCR, or PaddleOCR.
+- **Preprocessing**: Turn on/off deskewing, denoising, and contrast enhancement.
+- **Languages**: Configure which languages each engine should prioritize.
 
-**Import errors:**
-- Ensure virtual environment is activated
-- Reinstall: `pip install -r requirements.txt`
+---
 
-## GPU Support
+## 📝 License
 
-To enable GPU acceleration (requires CUDA):
-
-1. Uncomment GPU packages in `requirements.txt`
-2. Set `gpu: true` in `config.yaml` for desired engines
-3. Reinstall: `pip install -r requirements.txt`
-
-## License
-
-MIT License - Feel free to use and modify!
+This project is open-source and available under the **MIT License**. Use and modify freely for personal or commercial projects.
